@@ -17,8 +17,7 @@ namespace Airplane_exam
             BackgroundColor = ConsoleColor.White;
             ForegroundColor = ConsoleColor.DarkBlue;
             Clear();
-            string fPath = "Black_Box.txt";
-            string str;
+            string fPath = "Black_Box.txt", str = "";
             int height = 0, speed = 0, distance = 0, points = 0, height_comparison = 0, recomend_heidht = 0, x = 10, y = 40;
             Random random = new Random();
             //корректировка погодных условий 
@@ -31,14 +30,22 @@ namespace Airplane_exam
 
             WriteLine("Введите имя первого диспетчера");
             string name1 = ReadLine();
+            Dispatcher dispatcher1 = new Dispatcher(name1);
+            //подписка на событие вывода на консоль текущей скорости и высоты
+            dispatcher1.fly_event += air.Flight_correction;
+            //подписка на событие штрафных баллов
+            dispatcher1.delegpoints += air.Points_penal;
 
             WriteLine("Введите имя второго диспетчера");
             string name2 = ReadLine();
+            Dispatcher dispatcher2 = new Dispatcher(name2);
+            dispatcher2.fly_event += air.Flight_correction;
+            dispatcher2.delegpoints += air.Points_penal;
             Clear();
 
-            Write($"Управление самолетом переходит диспетчеру {name1}\n");
-            Write("Начните полет с набора скорости на взлетной полосе клавишой ->\n");
-
+            Write( $"Управление самолетом переходит диспетчеру {name1}\n");
+            Write( "Начните полет с набора скорости на взлетной полосе клавишой ->\n");
+             
             do
             {
                 key = Console.ReadKey();
@@ -49,18 +56,15 @@ namespace Airplane_exam
 
             } while (key.Key != ConsoleKey.RightArrow);
             Clear();
-            Write("Вы начинаете набор скорости и высоты\n");
+            Write( "Вы начинаете набор скорости и высоты\n");
 
             do
             {
 
                 Clear();
                 SetCursorPosition(x, y);
-                WriteLine("^--/-->");
+                WriteLine("^==/==>");
 
-                Dispatcher dispatcher1 = new Dispatcher(name1);
-                //подписка на событие вывода на консоль текущей скорости и высоты
-                dispatcher1.fly_event += air.Flight_correction;
                 key = ReadKey(true);
                 if (key.Key == ConsoleKey.UpArrow)
                 {
@@ -121,8 +125,7 @@ namespace Airplane_exam
                 //событие вывода на консоль текущей скорости и высоты
                 dispatcher1.Flight_correction(air.Myspeed, air.Myheight);
 
-                Write($"Рекомендуемая высота {recomend_heidht = 4 * air.Myspeed - wether}\n");
-
+                Write( $"Рекомендуемая высота {recomend_heidht = 4 * air.Myspeed - wether}\n");
                 WriteLine("***********************************************************");
                 //разница между рекомендуемой высотой и текущей
                 height_comparison = recomend_heidht - air.Myheight;
@@ -132,8 +135,7 @@ namespace Airplane_exam
                 air.Penalty_points_height(air.Myheight, height_comparison);
                 //увеличение дистанции
                 distance += 50;
-                //подписка на событие штрафных баллов
-                dispatcher1.delegpoints += air.Points_penal;
+               
                 //событие штрафных быллов
                 air.Points_penal(recomend_heidht, air.Myheight, height_comparison);
                 points = air.Mypoints;
@@ -142,7 +144,7 @@ namespace Airplane_exam
             } while (distance != 500);
             Clear();
             WriteLine("**************************************************************************************");
-            Write($"Вы пролетели {distance} км и теперь управление самолетом переходит диспетчеру {name2}\n");
+            Write( $"Вы пролетели {distance} км и теперь управление самолетом переходит диспетчеру {name2}\n");
             WriteLine("**************************************************************************************");
             ReadKey();
             do
@@ -150,10 +152,8 @@ namespace Airplane_exam
 
                 Clear();
                 SetCursorPosition(x, y);
-                WriteLine("^--/-->");
-
-                Dispatcher dispatcher2 = new Dispatcher(name2);
-                dispatcher2.fly_event += air.Flight_correction;
+                WriteLine("^==/==>");
+               
                 key = ReadKey(true);
                 if (key.Key == ConsoleKey.UpArrow)
                 {
@@ -214,22 +214,20 @@ namespace Airplane_exam
                 //событие вывода на консоль текущей скорости и высоты
                 dispatcher2.Flight_correction(air.Myspeed, air.Myheight);
 
-                Write($"Рекомендуемая высота {recomend_heidht = 4 * air.Myspeed - wether2}\n");
-
+                Write( $"Рекомендуемая высота {recomend_heidht = 4 * air.Myspeed - wether2}\n");
                 WriteLine("***********************************************************");
                 height_comparison = recomend_heidht - air.Myheight;
                 if (height_comparison < 0)
                     height_comparison*=-1;
                 air.Penalty_points_height(air.Myheight, height_comparison);
                 distance += 50;
-                dispatcher2.delegpoints += air.Points_penal;
                 air.Points_penal(recomend_heidht, air.Myheight, height_comparison);
                 ReadKey();
 
             } while (distance != 950);
             Clear();
             WriteLine("***********************************************************");
-            WriteLine("Происходит посадка самолета, снизьте скорость и высоту до 0");
+            WriteLine( "Происходит посадка самолета, снизьте скорость и высоту до 0");
             WriteLine("***********************************************************");
             ReadKey();
             do
@@ -246,10 +244,8 @@ namespace Airplane_exam
 
                 Clear();
                 SetCursorPosition(x, y);
-                WriteLine("^--/-->");
+                WriteLine("^==/==>");
 
-                Dispatcher dispatcher2 = new Dispatcher(name2);
-                dispatcher2.fly_event += air.Flight_correction;
                 switch (Console.ReadKey().Key)
                 {
                     case ConsoleKey.UpArrow:
@@ -301,10 +297,17 @@ namespace Airplane_exam
 
             } while (air.Myspeed > 0 && air.Myheight > 0);
             Clear();
+            string tmp_str;
             WriteLine("******************************************************");
-            WriteLine(str = "Программа «Тренажер пилота самолета» завершена успешно");
-            WriteLine(str = $"Диспетчер {name1} начислил(а) {points} штрафных баллов");
-            WriteLine(str = $"Диспетчер {name2} начислил(а) {air.Mypoints - points} штрафных баллов");
+            Write(tmp_str = "Программа «Тренажер пилота самолета» завершена успешно\n");
+            str += tmp_str;
+            tmp_str = "";
+            Write(tmp_str = $"Диспетчер {name1} начислил(а) {points} штрафных баллов\n");
+            str += tmp_str;
+            tmp_str = "";
+            Write(tmp_str = $"Диспетчер {name2} начислил(а) {air.Mypoints - points} штрафных баллов\n");
+            str += tmp_str;
+            tmp_str = "";
             WriteLine("******************************************************");
             using (FileStream fs = new FileStream(fPath, FileMode.Append, FileAccess.Write, FileShare.Write))
             {
@@ -312,7 +315,7 @@ namespace Airplane_exam
                 fs.Write(str_byte, 0, str_byte.Length);
             }
 
-            WriteLine("\n\nЕсли хотите Открыть черный ящик нажмите 1");
+            WriteLine("\n\nЕсли хотите открыть черный ящик нажмите 1");
             short key_box = short.Parse(Console.ReadLine());
 
             if (key_box == 1)
